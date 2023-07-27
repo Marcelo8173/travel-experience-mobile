@@ -5,13 +5,25 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 
 interface InputProps extends TextInputProps {
   label: string;
+  hasError?: boolean;
+  getValue?: (value: string) => void;
 }
 
-const InputCalendar = ({ label, ...rest }: InputProps) => {
+const InputCalendar = ({
+  label,
+  getValue,
+  hasError = false,
+  ...rest
+}: InputProps) => {
   return (
-    <Container>
+    <Container hasError={hasError}>
       <TextLabel>{label}</TextLabel>
       <DateTimePicker
+        onChange={(value) => {
+          const timestamp = value.nativeEvent.timestamp;
+          const date = new Date(timestamp!).toISOString();
+          !!getValue && getValue(date);
+        }}
         style={{
           height: 30,
           alignItems: "center",

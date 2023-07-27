@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Container,
   Header,
@@ -16,9 +16,36 @@ import { AntDesign } from "@expo/vector-icons";
 import { TouchableOpacity, ScrollView, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { Input } from "../../components";
+import { api } from "../../api";
+import { validateFields } from "./validation";
+
+interface CredentialsProps {
+  email: string;
+  password: string;
+}
 
 const Login = () => {
   const navigation = useNavigation<any>();
+  const [credentials, setCredentials] = useState<CredentialsProps>({} as CredentialsProps);
+  const [error, serError] = useState<String[]>([]);
+
+  const handleChange = (key: string, value: any) => {
+    serError([]);
+    const obj: any = {
+      ...credentials,
+      [key]: value,
+    };
+    setCredentials(obj);
+  };
+
+  const handleSubmit = async () => {
+    serError(validateFields(credentials));
+
+    if (error.length !== 0) {
+      return;
+    }
+    await api.post("/login", credentials);
+  };
 
   return (
     <Container>
@@ -46,6 +73,8 @@ const Login = () => {
             label="Digite seu e-mail"
             placeholder="você@exemplo.com"
             keyboardType="email-address"
+            onChange={(value) => handleChange("email", value)}
+            hasError={error.includes("email")}
           />
           <Divider />
           <Input
@@ -53,9 +82,11 @@ const Login = () => {
             textContentType="password"
             label="Informe uma senha"
             placeholder="********"
+            onChange={(value) => handleChange("password", value)}
+            hasError={error.includes("email")}
           />
 
-          <SubmitButton>
+          <SubmitButton onPress={handleSubmit}>
             <TextButtonSubmit>Entrar</TextButtonSubmit>
           </SubmitButton>
 

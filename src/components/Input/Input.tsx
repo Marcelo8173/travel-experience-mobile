@@ -4,11 +4,12 @@ import { TextInputProps } from "react-native";
 
 interface InputProps extends TextInputProps {
     label: string;
+    hasError?: boolean;
 }
 
-const Input = ({ label ,...rest }: InputProps) => {
+const Input = ({ label, hasError = false ,...rest }: InputProps) => {
   return (
-    <Container>
+    <Container hasError={hasError}>
       <TextLabel>{label}</TextLabel>
       <TextInput {...rest} placeholderTextColor="#666360" />
     </Container>
